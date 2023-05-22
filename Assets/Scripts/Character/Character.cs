@@ -17,24 +17,14 @@ public class CharacterStatus
     [field: SerializeField] public float Jump { get; set; }
     [field: SerializeField] public float Defense { get; set; }
     [field: SerializeField] public float Pierce { get; set; }
-    [field: SerializeField] public float GravityAccel { get; set; }
+    [field: SerializeField] public float Gravity { get; set; }
 }
 public abstract class Character : MonoBehaviour
 {
     public Vector3 Direction;
     public CharacterStatus Status;
     public CharacterType Type;
-    public CharacterController Controller;
 
-    protected virtual void Start()
-    {
-        Controller = GetComponent<CharacterController>();
-    }
-
-    protected virtual void Update()
-    {
-        Gravity();
-    }
     public void Attack(Character target)
     {
         target.Hit(Status.Damage, Status.Pierce);
@@ -46,10 +36,5 @@ public abstract class Character : MonoBehaviour
     public void Heal(float recovery)
     {
         Status.Hp += recovery;
-    }
-    private void Gravity()
-    {
-        if (!Controller.isGrounded)
-            Direction.y -= Status.GravityAccel;
     }
 }
