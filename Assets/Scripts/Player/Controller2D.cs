@@ -1,32 +1,17 @@
 using UnityEngine;
 
-[RequireComponent(typeof(BoxCollider2D))]
-public class Controller2D : MonoBehaviour
+
+public class Controller2D : RaycastController
 {
-    // 충돌을 감지할 레이어 마스크
-    public LayerMask collisionMask;
 
-    // 두께
-    const float skinWidth = 0.015f;
+    float maxClimbAngle = 80f;
+    float maxDescendAngle = 80f;
 
-    // 가로 세로 Ray 개수
-    public int horizontalRayCount = 4;
-    public int verticalRayCount = 4;
-
-    float maxClimbAngle = 80;
-    float maxDescendAngle = 80;
-
-    float horizontalRaySpacing;
-    float verticalRaySpacing;
-
-    BoxCollider2D collider;
-    RaycastOrigins raycastOrigins;
     public CollisionInfo collisions;
 
-    void Start()
+    public override void Start()
     {
-        collider = GetComponent<BoxCollider2D>();
-        CalculateRaySpacing();
+        base.Start();
     }
 
     public void Move(Vector3 velocity)
@@ -76,10 +61,11 @@ public class Controller2D : MonoBehaviour
             rayOrigin += Vector2.up * (horizontalRaySpacing * i);
 
             RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.right * directionX, rayLength, collisionMask);
+
             Debug.DrawRay(rayOrigin, Vector2.right * directionX * rayLength, Color.red);
 
             // 레이 충돌(벽을 만났을 때)
-            if (hit)
+            if (hit && hit.transform.tag != "Floor")
             {
                 // 수직방향과 충돌 지점의 법선 벡터(면에 수직) 사이의 각도를 통한 경사각 계산
                 float slopeAngle = Vector2.Angle(hit.normal, Vector2.up);
@@ -159,7 +145,7 @@ public class Controller2D : MonoBehaviour
             Debug.DrawRay(rayOrigin, Vector2.up * directionY * rayLength, Color.red);
 
             // 레이 충돌
-            if (hit)
+            if (hit && directionY != 1)
             {
                 // y축 속도 조정(대상의 거리 비례)
                 velocity.y = (hit.distance - skinWidth) * directionY;
@@ -278,44 +264,6 @@ public class Controller2D : MonoBehaviour
             }
         }
     }
-
-    // 레이 정점들 업데이트
-    void UpdateRaycastOrigins()
-    {
-        // 콜라이더 정점을 가져온 후 skinWidth 만큼 축소
-        Bounds bounds = collider.bounds;
-        bounds.Expand(skinWidth * -2);
-
-        // 정점들을 업데이트
-        raycastOrigins.bottomLeft = new Vector2(bounds.min.x, bounds.min.y);
-        raycastOrigins.bottomRight = new Vector2(bounds.max.x, bounds.min.y);
-        raycastOrigins.topLeft = new Vector2(bounds.min.x, bounds.max.y);
-        raycastOrigins.topRight = new Vector2(bounds.max.x, bounds.max.y);
-    }
-
-    // 레이 정점들 간격 계산
-    void CalculateRaySpacing()
-    {
-        // 콜라이더 정점을 가져온 후 skinWidth 만큼 축소
-        Bounds bounds = collider.bounds;
-        bounds.Expand(skinWidth * -2);
-
-        // 가로 세로 레이의 개수 보정
-        horizontalRayCount = Mathf.Clamp(horizontalRayCount, 2, int.MaxValue);
-        verticalRayCount = Mathf.Clamp(verticalRayCount, 2, int.MaxValue);
-
-        // 레이의 간격 계산
-        horizontalRaySpacing = bounds.size.y / (horizontalRayCount - 1);
-        verticalRaySpacing = bounds.size.x / (verticalRayCount - 1);
-    }
-
-    // 레이 캐스트를 위치를 잡기 위한 정점들
-    struct RaycastOrigins
-    {
-        public Vector2 topLeft, topRight;
-        public Vector2 bottomLeft, bottomRight;
-    }
-
     // 충돌 정보
     public struct CollisionInfo
     {
@@ -342,5 +290,4 @@ public class Controller2D : MonoBehaviour
             slopeAngle = 0;
         }
     }
-
 }
