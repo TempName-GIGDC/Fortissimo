@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[RequireComponent(typeof(Controller2D))]
+[RequireComponent(typeof(CharacterController2D))]
 public class Player : MonoBehaviour
 {
     // 점프 높이
@@ -23,11 +23,11 @@ public class Player : MonoBehaviour
 
     float velocityXSmoothing;
 
-    Controller2D controller;
+    CharacterController2D controller;
 
     void Start()
     {
-        controller = GetComponent<Controller2D>();
+        controller = GetComponent<CharacterController2D>();
 
         // 움직임 = 초기속도 * 시간 + 가속도 * 시간^2 * 1/2
         // 위 식을 자체변수로 바꾸면
@@ -43,7 +43,7 @@ public class Player : MonoBehaviour
 
     void Update()
     {
-        // 위쪽, 아레쪽 충돌시 속도를 0으로 초기화
+        // 아레쪽 충돌시 속도를 0으로 초기화
         if (controller.collisions.above || controller.collisions.below)
         {
             velocity.y = 0;
