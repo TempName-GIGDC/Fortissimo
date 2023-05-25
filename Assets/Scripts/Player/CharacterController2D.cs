@@ -22,20 +22,30 @@ public class CharacterController2D : RaycastController
         collisions.Reset();
         collisions.velocityOld = velocity;
 
-        HorizontalCheck(velocity);
-        VerticalCheck(velocity);
+        HorizontalCheck(ref velocity);
+        VerticalCheck(ref velocity);
 
-        if (collisions.left || collisions.right)
-            velocity.x = 0;
-
-        if (collisions.above || collisions.below)
-            velocity.y = 0;
+        if (collisions.climbingSlope)
+        {
+            print("climbing");
+            float distance = Mathf.Abs(velocity.x);
+            velocity.y = Mathf.Sin(collisions.slopeAngle * Mathf.Deg2Rad) * distance;
+            velocity.x = Mathf.Cos(collisions.slopeAngle * Mathf.Deg2Rad) * distance * Mathf.Sign(velocity.x);
+        }
+        
+        else if (collisions.descendingSlope)
+        {
+            print("descending");
+            float distance = Mathf.Abs(velocity.x);
+            velocity.y = -Mathf.Sin(collisions.slopeAngle * Mathf.Deg2Rad) * distance;
+            velocity.x = Mathf.Cos(collisions.slopeAngle * Mathf.Deg2Rad) * distance * Mathf.Sign(velocity.x);
+        }
 
         // 최종 움직임
         transform.Translate(velocity);
     }
 
-    void HorizontalCheck(Vector3 velocity)
+    void HorizontalCheck(ref Vector3 velocity)
     {
         float directionX = Mathf.Sign(velocity.x);
         float rayLength = Mathf.Abs(velocity.x) + skinWidth;
@@ -51,22 +61,26 @@ public class CharacterController2D : RaycastController
 
             if (hit)
             {
+                float slopeAngle = Vector2.Angle(hit.normal, Vector2.up);
                 if (hit.transform.CompareTag("Wall"))
                 {
                     if (directionX == -1)
                         collisions.left = true;
                     else if (directionX == 1)
                         collisions.right = true;
+
+                    velocity.x = (hit.distance - skinWidth) * directionX;
                 }
-                else
+                else if(i == 0 && slopeAngle <= maxClimbAngle)
                 {
                     collisions.climbingSlope = true;
+                    collisions.slopeAngle = slopeAngle;
                 }
             }
         }
     }
 
-    void VerticalCheck(Vector3 velocity)
+    void VerticalCheck(ref Vector3 velocity)
     {
         float directionY = Mathf.Sign(velocity.y);
         float rayLength = Mathf.Abs(velocity.y) + skinWidth;
@@ -75,7 +89,7 @@ public class CharacterController2D : RaycastController
         {
             Vector2 rayOrigin = (directionY == -1) ? raycastOrigins.bottomLeft : raycastOrigins.topLeft;
 
-            rayOrigin += Vector2.right * (verticalRaySpacing * i + velocity.x);
+            rayOrigin += Vector2.right * (verticalRaySpacing * i);
 
             RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.up * directionY, rayLength, collisionMask);
             Debug.DrawRay(rayOrigin, Vector2.up * directionY * rayLength, Color.red);
@@ -83,13 +97,29 @@ public class CharacterController2D : RaycastController
             if (hit)
             {
                 if (directionY == -1)
-                    collisions.below = true;
+                {
+                    float slopeAngle = Vector2.Angle(hit.normal, Vector2.up);
+                    if (slopeAngle != 0 && slopeAngle <= maxDescendAngle)
+                    {
+                        collisions.descendingSlope = true;
+                        collisions.slopeAngle = slopeAngle;
+                    }
+                    else if (slopeAngle == 0 && !hit.transform.CompareTag("Stair"))
+                    {
+                        print("below");
+                        collisions.below = true;
+                        velocity.y = (hit.distance - skinWidth) * directionY;
+                    }
+                }
                 else if (directionY == 1 && hit.transform.CompareTag("Wall"))
+                {
                     collisions.above = true;
+                    velocity.y = (hit.distance - skinWidth) * directionY;
+                }
             }
         }
     }
-
+    
     // 충돌 정보
     public struct CollisionInfo
     {

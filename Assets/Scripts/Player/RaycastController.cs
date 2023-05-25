@@ -34,7 +34,7 @@ public class RaycastController : MonoBehaviour
         // 콜라이더 정점을 가져온 후 skinWidth 만큼 축소
         Bounds bounds = collider.bounds;
         bounds.Expand(skinWidth * -2);
-
+        
         // 정점들을 업데이트
         raycastOrigins.bottomLeft = new Vector2(bounds.min.x, bounds.min.y);
         raycastOrigins.bottomRight = new Vector2(bounds.max.x, bounds.min.y);

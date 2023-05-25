@@ -43,16 +43,13 @@ public class Player : MonoBehaviour
 
     void Update()
     {
-        // 아레쪽 충돌시 속도를 0으로 초기화
-        if (controller.collisions.above || controller.collisions.below)
-        {
+        if (controller.collisions.above || controller.collisions.below || controller.collisions.climbingSlope || controller.collisions.descendingSlope)
             velocity.y = 0;
-        }
 
         Vector2 input = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
 
         // 스페이스바 입력, 바닥에 닿아있을때 점프
-        if (Input.GetKeyDown(KeyCode.Space) && controller.collisions.below)
+        if (Input.GetKeyDown(KeyCode.Space) && (controller.collisions.below || controller.collisions.climbingSlope || controller.collisions.descendingSlope))
         {
             velocity.y = jumpVelocity;
         }
