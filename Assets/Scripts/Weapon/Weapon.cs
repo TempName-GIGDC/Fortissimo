@@ -17,6 +17,8 @@ public struct WeaponStruct
     /// 사거리
     /// </summary>
     public Bounds Range;
+    public Vector2 PointA;
+    public Vector2 PointB;
     /// <summary>
     /// 치명타 확률
     /// </summary>
@@ -29,8 +31,20 @@ public struct WeaponStruct
     /// 관통율
     /// </summary>
     public float Penetrate;
+    /// <summary>
+    /// 충격 데미지 퍼센트
+    /// </summary>
+    public float Shock;
+    /// <summary>
+    /// 관통 데미지 퍼센트
+    /// </summary>
+    public float Pierce;
+    /// <summary>
+    /// 베기 데미지 퍼센트
+    /// </summary>
+    public float Cut;
 }
+
 public abstract class Weapon : MonoBehaviour
 {
-
 }

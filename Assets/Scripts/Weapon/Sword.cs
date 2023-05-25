@@ -2,19 +2,26 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Sword : MonoBehaviour
+public class Sword : Weapon
 {
-    [SerializeField]private WeaponStruct weaponStruct;
+    [SerializeField] private WeaponStruct weaponStruct;
 
-    // Start is called before the first frame update
-    void Start()
-    {
+    LayerMask enemyLayer;
 
-    }
-
-    // Update is called once per frame
     void Update()
     {
+
+        Collider2D[] colliders = Physics2D.OverlapAreaAll(weaponStruct.PointA, weaponStruct.PointB, enemyLayer);
+
+        foreach (Collider2D collider in colliders)
+        {
+            Debug.Log("Enemyname: " + collider.gameObject.name);
+        }
         
+    }
+    public void InputRangeCheck()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireCube(weaponStruct.Range.center, weaponStruct.Range.size);
     }
 }
