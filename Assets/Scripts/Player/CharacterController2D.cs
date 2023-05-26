@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 
@@ -14,6 +15,49 @@ public class CharacterController2D : RaycastController
         base.Start();
     }
 
+    public void Dash(Vector3 velocity)
+    {
+        UpdateRaycastOrigins();
+
+        // 기존 정보들 리셋
+        collisions.Reset();
+        collisions.velocityOld = velocity;
+
+        HorizontalCheck(ref velocity);
+        VerticalCheck(ref velocity);
+
+        if (collisions.floor || collisions.climbingSlope || collisions.descendingSlope)
+            velocity.y = collisions.velocityOld.y;
+
+        // 최종 움직임
+        transform.Translate(velocity);
+    }
+
+    public void DownJump()
+    {
+        UpdateRaycastOrigins();
+        for (int i = 0; i < verticalRayCount; i++)
+        {
+            Vector2 rayOrigin = raycastOrigins.bottomLeft;
+
+            rayOrigin += Vector2.right * (verticalRaySpacing * i);
+
+            RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.down, skinWidth * 2f, collisionMask);
+
+            if (hit && !hit.transform.CompareTag("Wall"))
+            {
+                StartCoroutine(SwitchLayer(hit.transform.gameObject));
+            }
+        }
+    }
+
+    IEnumerator SwitchLayer(GameObject g)
+    {
+        g.layer = 0;
+        yield return new WaitForSeconds(0.3f);
+        g.layer = 6;
+    }
+
     public void Move(Vector3 velocity)
     {
         UpdateRaycastOrigins();
@@ -27,15 +71,15 @@ public class CharacterController2D : RaycastController
 
         if (collisions.climbingSlope)
         {
-            print("climbing");
+            //print("climbing");
             float distance = Mathf.Abs(velocity.x);
             velocity.y = Mathf.Sin(collisions.slopeAngle * Mathf.Deg2Rad) * distance;
             velocity.x = Mathf.Cos(collisions.slopeAngle * Mathf.Deg2Rad) * distance * Mathf.Sign(velocity.x);
         }
-        
+
         else if (collisions.descendingSlope)
         {
-            print("descending");
+            //print("descending");
             float distance = Mathf.Abs(velocity.x);
             velocity.y = -Mathf.Sin(collisions.slopeAngle * Mathf.Deg2Rad) * distance;
             velocity.x = Mathf.Cos(collisions.slopeAngle * Mathf.Deg2Rad) * distance * Mathf.Sign(velocity.x);
@@ -71,7 +115,7 @@ public class CharacterController2D : RaycastController
 
                     velocity.x = (hit.distance - skinWidth) * directionX;
                 }
-                else if(i == 0 && slopeAngle <= maxClimbAngle)
+                else if (i == 0 && slopeAngle <= maxClimbAngle)
                 {
                     collisions.climbingSlope = true;
                     collisions.slopeAngle = slopeAngle;
@@ -106,8 +150,11 @@ public class CharacterController2D : RaycastController
                     }
                     else if (slopeAngle == 0 && !hit.transform.CompareTag("Stair"))
                     {
-                        print("below");
-                        collisions.below = true;
+                        //print("below");
+                        if (hit.transform.CompareTag("Wall"))
+                            collisions.below = true;
+                        else if (hit.transform.CompareTag("Floor"))
+                            collisions.floor = true;
                         velocity.y = (hit.distance - skinWidth) * directionY;
                     }
                 }
@@ -119,12 +166,12 @@ public class CharacterController2D : RaycastController
             }
         }
     }
-    
+
     // 충돌 정보
     public struct CollisionInfo
     {
         // 하좌우 충돌 여부
-        public bool above, below;
+        public bool above, below, floor;
         public bool left, right;
 
         // 오르내리기 가능 여부
@@ -137,7 +184,7 @@ public class CharacterController2D : RaycastController
 
         public void Reset()
         {
-            above = below = false;
+            above = below = floor = false;
             left = right = false;
             climbingSlope = false;
             descendingSlope = false;
