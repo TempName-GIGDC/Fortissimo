@@ -14,11 +14,11 @@ public struct WeaponStruct
     /// </summary>
     public float AttackSpeed;
     /// <summary>
-    /// 사거리
+    /// 사거리 조절 변수 A,B
     /// </summary>
-    public Bounds Range;
-    public Vector2 PointA;
-    public Vector2 PointB;
+    //public Bounds Range;
+    public Vector3 PointA;
+    public Vector3 PointB;
     /// <summary>
     /// 치명타 확률
     /// </summary>

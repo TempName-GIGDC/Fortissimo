@@ -6,12 +6,12 @@ public class Sword : Weapon
 {
     [SerializeField] private WeaponStruct weaponStruct;
 
-    LayerMask enemyLayer;
+    public LayerMask EnemyInfo;
 
     void Update()
     {
 
-        Collider2D[] colliders = Physics2D.OverlapAreaAll(weaponStruct.PointA, weaponStruct.PointB, enemyLayer);
+        Collider2D[] colliders = Physics2D.OverlapAreaAll(weaponStruct.PointA, weaponStruct.PointB, EnemyInfo);
 
         foreach (Collider2D collider in colliders)
         {
@@ -22,6 +22,6 @@ public class Sword : Weapon
     public void InputRangeCheck()
     {
         Gizmos.color = Color.red;
-        Gizmos.DrawWireCube(weaponStruct.Range.center, weaponStruct.Range.size);
+        Gizmos.DrawWireCube(weaponStruct.PointA, weaponStruct.PointB);
     }
 }
