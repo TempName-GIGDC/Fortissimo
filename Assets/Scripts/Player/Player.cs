@@ -52,11 +52,20 @@ public class Player : MonoBehaviour
         // 점프 속도 = 중력 * 최고 높이에 도달하는 시간
         jumpVelocity = Mathf.Abs(gravity) * timeToJumpApex;
 
-        print("Gravity: " + gravity + "  Jump Velocity: " + jumpVelocity);
+        //print("Gravity: " + gravity + "  Jump Velocity: " + jumpVelocity);
     }
 
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            Time.timeScale = 0.1f;
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            Time.timeScale = 1f;
+        }
+
         //print(dashVelocity);
         if (controller.collisions.above)
             velocity.y = 0;
@@ -70,17 +79,17 @@ public class Player : MonoBehaviour
         Vector2 input = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
 
         // 스페이스바 입력, 바닥에 닿아있을때 점프
-        if (Input.GetKeyDown(KeyCode.Space) && jumpCount > 0)
+        if (Input.GetKeyDown(KeyCode.Space))
         {
-            //if (Input.GetKey(KeyCode.S))
-            //{
-            //    controller.DownJump();
-            //}
-            //else
-            //{
-            velocity.y = jumpVelocity;
-            jumpCount--;
-            //}
+            if (Input.GetKey(KeyCode.S))
+            {
+                controller.DownJump();
+            }
+            else if (jumpCount > 0)
+            {
+                velocity.y = jumpVelocity;
+                jumpCount--;
+            }
         }
 
         if (Input.GetKeyDown(KeyCode.Mouse1))
