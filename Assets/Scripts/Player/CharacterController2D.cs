@@ -42,7 +42,7 @@ public class CharacterController2D : RaycastController
 
             rayOrigin += Vector2.right * (verticalRaySpacing * i);
 
-            RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.down, skinWidth * 3f, collisionMask);
+            RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.down, skinWidth * 7f, collisionMask);
 
             if (hit && !hit.transform.CompareTag("Wall"))
             {
@@ -71,20 +71,16 @@ public class CharacterController2D : RaycastController
 
         if (collisions.climbingSlope)
         {
-            print("climbing");
             float distance = Mathf.Abs(velocity.x);
             velocity.y = Mathf.Sin(collisions.slopeAngle * Mathf.Deg2Rad) * distance;
             velocity.x = Mathf.Cos(collisions.slopeAngle * Mathf.Deg2Rad) * distance * Mathf.Sign(velocity.x);
         }
-
         else if (collisions.descendingSlope)
         {
             float distance = Mathf.Abs(velocity.x);
             velocity.y = -Mathf.Sin(collisions.slopeAngle * Mathf.Deg2Rad) * distance;
             velocity.x = Mathf.Cos(collisions.slopeAngle * Mathf.Deg2Rad) * distance * Mathf.Sign(velocity.x);
-            print("descending: " + velocity);
         }
-        //print("fin: " + velocity);
         // 최종 움직임
         transform.Translate(velocity);
     }
@@ -92,7 +88,7 @@ public class CharacterController2D : RaycastController
     void HorizontalCheck(ref Vector3 velocity)
     {
         float directionX = Mathf.Sign(velocity.x);
-        float rayLength = Mathf.Abs(velocity.x) + skinWidth;
+        float rayLength = skinWidth * 6f;
 
         for (int i = 0; i < horizontalRayCount; i++)
         {
@@ -105,7 +101,9 @@ public class CharacterController2D : RaycastController
 
             if (hit)
             {
+
                 float slopeAngle = Vector2.Angle(hit.normal, Vector2.up);
+                print(slopeAngle);
                 if (hit.transform.CompareTag("Wall"))
                 {
                     if (directionX == -1)
@@ -115,7 +113,7 @@ public class CharacterController2D : RaycastController
 
                     velocity.x = (hit.distance - skinWidth) * directionX;
                 }
-                else if (i == 0 && slopeAngle <= maxClimbAngle && velocity.y < 0f)
+                else if (i == 0 && velocity.y < 0f && slopeAngle <= 90f)
                 {
                     collisions.climbingSlope = true;
                     collisions.slopeAngle = slopeAngle;
@@ -127,7 +125,7 @@ public class CharacterController2D : RaycastController
     void VerticalCheck(ref Vector3 velocity)
     {
         float directionY = Mathf.Sign(velocity.y);
-        float rayLength = Mathf.Abs(velocity.y) + skinWidth;
+        float rayLength = skinWidth * 6f;
 
         for (int i = 0; i < verticalRayCount; i++)
         {
@@ -145,11 +143,10 @@ public class CharacterController2D : RaycastController
                     float slopeAngle = Vector2.Angle(hit.normal, Vector2.up);
                     if (slopeAngle != 0 && slopeAngle <= maxDescendAngle)
                     {
-
                         if (i == 0)
                         {
                             rayOrigin = raycastOrigins.bottomLeft;
-                            hit = Physics2D.Raycast(rayOrigin, Vector2.left, rayLength * 2f, collisionMask);
+                            hit = Physics2D.Raycast(rayOrigin, Vector2.left, rayLength, collisionMask);
                             if (hit)
                             {
                                 collisions.descendingSlope = true;
@@ -159,7 +156,7 @@ public class CharacterController2D : RaycastController
                         else if (i == verticalRayCount - 1)
                         {
                             rayOrigin = raycastOrigins.bottomRight;
-                            hit = Physics2D.Raycast(rayOrigin, Vector2.right, rayLength, collisionMask);
+                            hit = Physics2D.Raycast(rayOrigin, Vector2.right, rayLength * 2f, collisionMask);
                             if (hit)
                             {
                                 collisions.descendingSlope = true;
@@ -169,7 +166,6 @@ public class CharacterController2D : RaycastController
                     }
                     else if (slopeAngle == 0 && !hit.transform.CompareTag("Stair"))
                     {
-                        print("below");
                         if (hit.transform.CompareTag("Wall"))
                             collisions.below = true;
                         else if (hit.transform.CompareTag("Floor"))

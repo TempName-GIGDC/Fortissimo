@@ -66,7 +66,6 @@ public class Player : MonoBehaviour
             Time.timeScale = 1f;
         }
 
-        //print(dashVelocity);
         if (controller.collisions.above)
             velocity.y = 0;
 
@@ -104,6 +103,7 @@ public class Player : MonoBehaviour
         velocity.x = Mathf.SmoothDamp(velocity.x, targetVelocityX, ref velocityXSmoothing, (controller.collisions.below) ? accelerationTimeGrounded : accelerationTimeAirborne);
         velocity.y += gravity * Time.deltaTime;
 
+        //print(velocity);
         if (dashTimer > 0)
         {
             dashTimer -= Time.deltaTime;
@@ -116,6 +116,6 @@ public class Player : MonoBehaviour
 
     bool StayFloor()
     {
-        return controller.collisions.below || controller.collisions.floor || controller.collisions.climbingSlope || controller.collisions.descendingSlope;
+        return controller.collisions.below || controller.collisions.floor || controller.collisions.descendingSlope || controller.collisions.climbingSlope;
     }
 }
