@@ -6,6 +6,10 @@ using UnityEngine;
 public struct WeaponStruct
 {
     /// <summary>
+    /// 레이어 마스크 변수
+    /// </summary>
+    public LayerMask LayerName;
+    /// <summary>
     /// 공격력
     /// </summary>
     public int Damage;
@@ -14,11 +18,13 @@ public struct WeaponStruct
     /// </summary>
     public float AttackSpeed;
     /// <summary>
-    /// 사거리 조절 변수 A,B
+    /// 사거리 조절 변수
     /// </summary>
-    //public Bounds Range;
-    public Vector3 PointA;
-    public Vector3 PointB;
+    public Vector2 Range;
+    /// <summary>
+    /// 사거리 위치 변수
+    /// </summary>
+    public Transform RangeP;
     /// <summary>
     /// 치명타 확률
     /// </summary>
