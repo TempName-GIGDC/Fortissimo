@@ -8,7 +8,6 @@ public class Sword : Weapon
 
     void Update()
     {
-
         Collider2D[] colliders = Physics2D.OverlapBoxAll(weaponStruct.RangeP.position, weaponStruct.Range, 0, weaponStruct.LayerName);
 
         foreach (Collider2D collider in colliders)
@@ -17,7 +16,7 @@ public class Sword : Weapon
         }
         
     }
-    public void InputRangeCheck()
+    void OnDrawGizmos()
     {
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireCube(weaponStruct.RangeP.position, weaponStruct.Range);
