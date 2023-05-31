@@ -7,17 +7,36 @@ public enum CharacterType
     Player,
     Enemy
 }
+
+public enum CharacterState 
+{ 
+    Idle = 0,
+    Walk,
+    Dash,
+    Run,
+    Jump
+}
+
+public enum CharacterDeBuff
+{
+    Normal = 0,
+    bleeding,
+    Stun,
+    KnockBack
+}
+
 [Serializable]
-public class CharacterStatus
+public struct CharacterStatus
 {
     [field: SerializeField] public float Hp { get; set; }
     [field: SerializeField] public float Damage { get; set; }
     [field: SerializeField] public float Speed { get; set; }
     [field: SerializeField] public float AttackSpeed { get; set; }
-    [field: SerializeField] public float Jump { get; set; }
+    [field: SerializeField] public int JumpCount { get; set; }
+    [field: SerializeField] public float JumpHeight { get; set; }
+    [field: SerializeField] public float TimeToJumpApex { get; set; }
     [field: SerializeField] public float Defense { get; set; }
     [field: SerializeField] public float Pierce { get; set; }
-    [field: SerializeField] public float Gravity { get; set; }
 }
 public abstract class Character : MonoBehaviour
 {

@@ -719,9 +719,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 82a2c42c9afbc464688b1de9b99b14eb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  JumpCount: 2
-  jumpHeight: 4
-  timeToJumpApex: 0.4
+  Direction: {x: 0, y: 0, z: 0}
+  Status:
+    <Hp>k__BackingField: 0
+    <Damage>k__BackingField: 0
+    <Speed>k__BackingField: 0
+    <AttackSpeed>k__BackingField: 0
+    <JumpCount>k__BackingField: 0
+    <JumpHeight>k__BackingField: 4
+    <TimeToJumpApex>k__BackingField: 0.4
+    <Defense>k__BackingField: 0
+    <Pierce>k__BackingField: 0
+  Type: 1
   DashVelocity: 15
   DashTime: 0.1
 --- !u!61 &1901119736
