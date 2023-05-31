@@ -28,7 +28,7 @@ public struct WeaponStruct
     /// <summary>
     /// 치명타 확률
     /// </summary>
-    public float CriticalHitChance;
+    public int CriticalHitChance;
     /// <summary>
     /// 치명타 데미지
     /// </summary>
