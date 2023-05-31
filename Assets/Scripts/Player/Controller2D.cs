@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 
@@ -12,6 +13,55 @@ public class Controller2D : RaycastController
     public override void Start()
     {
         base.Start();
+    }
+
+    public void DownJump()
+    {
+        UpdateRaycastOrigins();
+        for (int i = 0; i < verticalRayCount; i++)
+        {
+            Vector2 rayOrigin = raycastOrigins.bottomLeft;
+
+            rayOrigin += Vector2.right * (verticalRaySpacing * i);
+
+            RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.down, skinWidth * 7f, collisionMask);
+
+            if (hit && !hit.transform.CompareTag("Wall"))
+            {
+                StartCoroutine(SwitchLayer(hit.transform.gameObject));
+            }
+        }
+    }
+
+    public void Dash(Vector3 velocity)
+    {
+        UpdateRaycastOrigins();
+
+        // 기존 정보들 리셋
+        collisions.Reset();
+        collisions.velocityOld = velocity;
+
+        // 경사에 따른 중력 적용
+        if (velocity.y < 0)
+        {
+            DescendSlope(ref velocity);
+        }
+        // x축 움직임 충돌 체크
+        if (velocity.x != 0)
+        {
+            HorizontalCollisions(ref velocity);
+        }
+        // y축 움직임 충돌 체크
+        if (velocity.y != 0)
+        {
+            VerticalCollisions(ref velocity);
+        }
+        if (!collisions.verticalWall)
+            velocity.y = collisions.velocityOld.y;
+        if (!collisions.horizontalWall)
+            velocity.x = collisions.velocityOld.x;
+        // 최종 움직임
+        transform.Translate(velocity);
     }
 
     public void Move(Vector3 velocity)
@@ -65,8 +115,10 @@ public class Controller2D : RaycastController
             Debug.DrawRay(rayOrigin, Vector2.right * directionX * rayLength, Color.red);
 
             // 레이 충돌(벽을 만났을 때)
-            if (hit && hit.transform.tag != "Floor")
+            if (hit && !hit.transform.CompareTag("Floor"))
             {
+                if (hit.transform.CompareTag("Wall"))
+                    collisions.horizontalWall = true;
                 // 수직방향과 충돌 지점의 법선 벡터(면에 수직) 사이의 각도를 통한 경사각 계산
                 float slopeAngle = Vector2.Angle(hit.normal, Vector2.up);
 
@@ -102,7 +154,7 @@ public class Controller2D : RaycastController
                 }
 
                 // 만약 경사를 오르는 중이 아니거나, 경사각이 최대 오를 수 있는 경사각 보다 크면
-                if (!collisions.climbingSlope || slopeAngle > maxClimbAngle)
+                if ((!collisions.climbingSlope || slopeAngle > maxClimbAngle) && !hit.transform.CompareTag("Stair"))
                 {
                     // x축 속도 조정(대상의 거리 비례)
                     velocity.x = (hit.distance - skinWidth) * directionX;
@@ -145,23 +197,92 @@ public class Controller2D : RaycastController
             Debug.DrawRay(rayOrigin, Vector2.up * directionY * rayLength, Color.red);
 
             // 레이 충돌
-            if (hit && directionY != 1)
+            if (hit)
             {
-                // y축 속도 조정(대상의 거리 비례)
-                velocity.y = (hit.distance - skinWidth) * directionY;
-                rayLength = hit.distance;
-
-                // 경사 올라가는 중
-                if (collisions.climbingSlope)
+                if (directionY != 1)
                 {
-                    // x축 속도 보정
-                    velocity.x = velocity.y / Mathf.Tan(collisions.slopeAngle * Mathf.Deg2Rad) * Mathf.Sign(velocity.x);
-                }
+                    if (hit.transform.CompareTag("Wall") || hit.transform.CompareTag("Floor"))
+                    {
+                        if (hit.transform.CompareTag("Wall"))
+                            collisions.verticalWall = true;
+                        // y축 속도 조정(대상의 거리 비례)
+                        velocity.y = (hit.distance - skinWidth) * directionY;
+                        rayLength = hit.distance;
 
-                // 이동 방향에 따른 위 아레 충돌 체크
-                collisions.below = directionY == -1;
-                collisions.above = directionY == 1;
+                        // 경사 올라가는 중
+                        if (collisions.climbingSlope)
+                        {
+                            // x축 속도 보정
+                            velocity.x = velocity.y / Mathf.Tan(collisions.slopeAngle * Mathf.Deg2Rad) * Mathf.Sign(velocity.x);
+                        }
+
+                        // 이동 방향에 따른 위 아레 충돌 체크
+                        collisions.below = true;
+                    }
+                    else if (hit.transform.CompareTag("Stair"))
+                    {
+                        if(i == 0)
+                        {
+                            hit = Physics2D.Raycast(rayOrigin, Vector2.left, rayLength, collisionMask);
+                            if (hit && Vector2.Angle(hit.normal, Vector2.up) <= 45f)
+                            {
+                                // y축 속도 조정(대상의 거리 비례)
+                                velocity.y = (hit.distance - skinWidth) * directionY;
+                                rayLength = hit.distance;
+
+                                // 경사 올라가는 중
+                                if (collisions.climbingSlope)
+                                {
+                                    // x축 속도 보정
+                                    velocity.x = velocity.y / Mathf.Tan(collisions.slopeAngle * Mathf.Deg2Rad) * Mathf.Sign(velocity.x);
+                                }
+
+                                // 이동 방향에 따른 위 아레 충돌 체크
+                                collisions.below = true;
+                            }
+                        }
+                        else
+                        {
+                            hit = Physics2D.Raycast(rayOrigin, Vector2.right, rayLength, collisionMask);
+                            if (hit && Vector2.Angle(hit.normal, Vector2.up) <= 45f)
+                            {
+                                // y축 속도 조정(대상의 거리 비례)
+                                velocity.y = (hit.distance - skinWidth) * directionY;
+                                rayLength = hit.distance;
+
+                                // 경사 올라가는 중
+                                if (collisions.climbingSlope)
+                                {
+                                    // x축 속도 보정
+                                    velocity.x = velocity.y / Mathf.Tan(collisions.slopeAngle * Mathf.Deg2Rad) * Mathf.Sign(velocity.x);
+                                }
+
+                                // 이동 방향에 따른 위 아레 충돌 체크
+                                collisions.below = true;
+                            }
+                        }
+                    }
+                }
+                else if(hit.transform.CompareTag("Wall"))
+                {
+                    collisions.verticalWall = true;
+                    // y축 속도 조정(대상의 거리 비례)
+                    velocity.y = (hit.distance - skinWidth) * directionY;
+                    rayLength = hit.distance;
+
+                    // 경사 올라가는 중
+                    if (collisions.climbingSlope)
+                    {
+                        // x축 속도 보정
+                        velocity.x = velocity.y / Mathf.Tan(collisions.slopeAngle * Mathf.Deg2Rad) * Mathf.Sign(velocity.x);
+                    }
+
+                    // 이동 방향에 따른 위 아레 충돌 체크
+                    collisions.above = true;
+
+                }
             }
+
         }
 
         // 경사 올라가는 중
@@ -264,6 +385,14 @@ public class Controller2D : RaycastController
             }
         }
     }
+
+    IEnumerator SwitchLayer(GameObject g)
+    {
+        g.layer = 0;
+        yield return new WaitForSeconds(0.3f);
+        g.layer = 6;
+    }
+
     // 충돌 정보
     public struct CollisionInfo
     {
@@ -275,6 +404,9 @@ public class Controller2D : RaycastController
         public bool climbingSlope;
         public bool descendingSlope;
 
+        public bool verticalWall;
+        public bool horizontalWall;
+
         // 경사각
         public float slopeAngle, slopeAngleOld;
         public Vector3 velocityOld;
@@ -283,6 +415,8 @@ public class Controller2D : RaycastController
         {
             above = below = false;
             left = right = false;
+            verticalWall = false;
+            horizontalWall = false;
             climbingSlope = false;
             descendingSlope = false;
 
