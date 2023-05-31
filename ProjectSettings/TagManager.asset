@@ -4,15 +4,17 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - SpawnPoint
+  - Floor
+  - Wall
+  - Stair
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Player
   - Water
   - UI
-  - 
+  - Ground
   - 
   - 
   - 
