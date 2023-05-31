@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[RequireComponent(typeof(CharacterController2D))]
+[RequireComponent(typeof(Controller2D))]
 public class Player : MonoBehaviour
 {
     public int JumpCount = 2;
@@ -34,11 +34,11 @@ public class Player : MonoBehaviour
 
     float velocityXSmoothing;
 
-    CharacterController2D controller;
+    Controller2D controller;
 
     void Start()
     {
-        controller = GetComponent<CharacterController2D>();
+        controller = GetComponent<Controller2D>();
         jumpCount = JumpCount;
         dashDirection = Vector2.zero;
         dashTimer = 0f;
@@ -103,7 +103,6 @@ public class Player : MonoBehaviour
         velocity.x = Mathf.SmoothDamp(velocity.x, targetVelocityX, ref velocityXSmoothing, (controller.collisions.below) ? accelerationTimeGrounded : accelerationTimeAirborne);
         velocity.y += gravity * Time.deltaTime;
 
-        //print(velocity);
         if (dashTimer > 0)
         {
             dashTimer -= Time.deltaTime;
@@ -116,6 +115,6 @@ public class Player : MonoBehaviour
 
     bool StayFloor()
     {
-        return controller.collisions.below || controller.collisions.floor || controller.collisions.descendingSlope || controller.collisions.climbingSlope;
+        return controller.collisions.below || controller.collisions.descendingSlope || controller.collisions.climbingSlope;
     }
 }
