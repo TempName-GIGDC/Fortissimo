@@ -104,10 +104,27 @@ public class Player : Character
 
     private void InputGroup()
     {
+        if (Input.GetKeyDown(KeyCode.Mouse0))
+        {
+            // Attack
+        }
         if (Input.GetKeyDown(KeyCode.Mouse1))
         {
+            // Dash
             dashDirection = Camera.main.ScreenToWorldPoint(Input.mousePosition) - transform.position;
             dashTimer = DashTime;
+        }
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            // Skill 1
+        }
+        if (Input.GetKeyDown(KeyCode.W))
+        {
+            // Skill 2
+        }
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            // Skill 3
         }
     }
 
