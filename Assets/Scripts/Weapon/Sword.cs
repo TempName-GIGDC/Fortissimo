@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Sword : Weapon
 {
-    [SerializeField] private WeaponStruct weaponStruct;
+    [SerializeField] private WeaponInfo weaponInfo;
     void Start()
     {
     }
@@ -13,10 +13,10 @@ public class Sword : Weapon
     {
         if(Input.GetKeyDown(KeyCode.Space))
         {
-            Debug.Log("Damage: " + DamageSystem.CalculateDamage(weaponStruct.Damage, weaponStruct.CriticalHitChance, weaponStruct.CriticalHitDamage));
+            Debug.Log("Damage: " + DamageSystem.CalculateDamage(weaponInfo.Damage, weaponInfo.CriticalHitChance, weaponInfo.CriticalHitDamage));
         }
 
-        Collider2D[] colliders = Physics2D.OverlapBoxAll(weaponStruct.RangeP.position, weaponStruct.Range, 0, weaponStruct.LayerName);
+        Collider2D[] colliders = Physics2D.OverlapBoxAll(weaponInfo.RangeP.position, weaponInfo.Range, 0, weaponInfo.LayerName);
 
         foreach (Collider2D collider in colliders)
         {
@@ -27,6 +27,6 @@ public class Sword : Weapon
     void OnDrawGizmos()
     {
         Gizmos.color = Color.yellow;
-        Gizmos.DrawWireCube(weaponStruct.RangeP.position, weaponStruct.Range);
+        Gizmos.DrawWireCube(weaponInfo.RangeP.position, weaponInfo.Range);
     }
 }
