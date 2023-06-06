@@ -31,11 +31,14 @@ public class Player : Character
     private float velocityXSmoothing;
     // 컨트롤러
     private Controller2D controller;
+    // 애니메이터
+    private PlayerAnimator playerAnimator;
     #endregion
 
     void Start()
     {
         controller = GetComponent<Controller2D>();
+        playerAnimator = GetComponent<PlayerAnimator>();
         PhysicsInit();
     }
 
@@ -68,9 +71,21 @@ public class Player : Character
     {
         if (controller.collisions.above || controller.collisions.below)
         {
+            print(controller.collisions.below);
             if (controller.collisions.below)
+            {
+                if (playerAnimator.animationState == PlayerAniState.Jump)
+                    playerAnimator.animationState = PlayerAniState.Idle;
                 jumpCount = 2;
+            }
             velocity.y = 0;
+        }
+        else
+        {
+            print(controller.collisions.below);
+            if (playerAnimator.animationState != PlayerAniState.Jump
+                && playerAnimator.animationState != PlayerAniState.Dash)
+                playerAnimator.animationState = PlayerAniState.Jump;
         }
     }
 
@@ -100,6 +115,17 @@ public class Player : Character
         // Mathf.SmoothDamp(현재값, 목표값, ref 속도, 시간)
         velocity.x = Mathf.SmoothDamp(velocity.x, targetVelocityX, ref velocityXSmoothing, (controller.collisions.below) ? accelerationTimeGrounded : accelerationTimeAirborne);
         velocity.y += gravity * Time.deltaTime;
+
+        if (Mathf.Abs(input.x) > 0)
+        {
+            if (playerAnimator.animationState == PlayerAniState.Idle)
+                playerAnimator.animationState = PlayerAniState.Run;
+        }
+        else
+        {
+            if (playerAnimator.animationState == PlayerAniState.Walk)
+                playerAnimator.animationState = PlayerAniState.Idle;
+        }
     }
 
     private void InputGroup()
@@ -132,11 +158,17 @@ public class Player : Character
     {
         if (dashTimer > 0)
         {
+            if (playerAnimator.animationState != PlayerAniState.Dash)
+                playerAnimator.animationState = PlayerAniState.Dash;
             dashTimer -= Time.deltaTime;
             velocity = dashDirection.normalized * DashVelocity;
             controller.Dash(velocity * Time.deltaTime);
         }
         else
+        {
+            if (playerAnimator.animationState == PlayerAniState.Dash)
+                playerAnimator.animationState = PlayerAniState.Idle;
             controller.Move(velocity * Time.deltaTime);
+        }
     }
 }
