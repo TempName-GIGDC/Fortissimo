@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[RequireComponent(typeof(Controller2D))]
+//[RequireComponent(typeof(Controller2D))]
 public class Player : Character
 {
     // 대쉬 속도
@@ -13,8 +13,6 @@ public class Player : Character
     private float accelerationTimeAirborne = 0.2f;
     // 지면에서의 가속도 시간
     private float accelerationTimeGrounded = 0.1f;
-    // 이동 속도
-    private float moveSpeed = 6;
     // 실제 점프 횟수를 카운트하는 변수
     private int jumpCount;
     // 실제 적용 받게될 중력
@@ -30,14 +28,16 @@ public class Player : Character
     // Mathf.Smooth 함수에서 연산용으로 쓰이는 변수
     private float velocityXSmoothing;
     // 컨트롤러
-    private Controller2D controller;
+    private CharacterController controller;
     // 애니메이터
     private PlayerAnimator playerAnimator;
     #endregion
 
+    bool isSwitching;
+
     void Start()
     {
-        controller = GetComponent<Controller2D>();
+        controller = GetComponent<CharacterController>();
         playerAnimator = GetComponent<PlayerAnimator>();
         PhysicsInit();
     }
@@ -69,24 +69,25 @@ public class Player : Character
 
     private void VerticalCollision()
     {
-        if (controller.collisions.above || controller.collisions.below)
-        {
-            print(controller.collisions.below);
-            if (controller.collisions.below)
-            {
-                if (playerAnimator.animationState == PlayerAniState.Jump)
-                    playerAnimator.animationState = PlayerAniState.Idle;
-                jumpCount = 2;
-            }
-            velocity.y = 0;
-        }
-        else
-        {
-            print(controller.collisions.below);
-            if (playerAnimator.animationState != PlayerAniState.Jump
-                && playerAnimator.animationState != PlayerAniState.Dash)
-                playerAnimator.animationState = PlayerAniState.Jump;
-        }
+        //if (controller.collisions.above || controller.collisions.below)
+        //{
+        //    print(controller.collisions.below);
+        //    if (controller.collisions.below)
+        //    {
+        //        if (playerAnimator.animationState == PlayerAniState.Jump)
+        //            playerAnimator.animationState = PlayerAniState.Idle;
+        //        jumpCount = 2;
+        //    }
+        //    velocity.y = 0;
+        //}
+        //else
+        //{
+        //    print(controller.collisions.below);
+        //    if (playerAnimator.animationState != PlayerAniState.Jump
+        //        && playerAnimator.animationState != PlayerAniState.Dash)
+        //        playerAnimator.animationState = PlayerAniState.Jump;
+        //}
+        
     }
 
     private void Jump()
@@ -96,24 +97,22 @@ public class Player : Character
             // 하단 점프
             if (Input.GetKey(KeyCode.S))
             {
-                controller.DownJump();
+                //controller.DownJump();
+                isSwitching = true;
             }
             // 일반 점프
-            else if (jumpCount > 0)
-            {
+            else
                 velocity.y = jumpVelocity;
-                jumpCount--;
-            }
         }
     }
 
     private void VelocityInput()
     {
         Vector2 input = new Vector2(Input.GetAxisRaw("Horizontal"), 0);
-        float targetVelocityX = input.x * moveSpeed;
+        float targetVelocityX = input.x * Status.Speed;
         // 부드러운 감속과 가속을 위한 SmoothDamp 함수
         // Mathf.SmoothDamp(현재값, 목표값, ref 속도, 시간)
-        velocity.x = Mathf.SmoothDamp(velocity.x, targetVelocityX, ref velocityXSmoothing, (controller.collisions.below) ? accelerationTimeGrounded : accelerationTimeAirborne);
+        velocity.x = Mathf.SmoothDamp(velocity.x, targetVelocityX, ref velocityXSmoothing, accelerationTimeGrounded);
         velocity.y += gravity * Time.deltaTime;
 
         if (Mathf.Abs(input.x) > 0)
@@ -123,7 +122,7 @@ public class Player : Character
         }
         else
         {
-            if (playerAnimator.animationState == PlayerAniState.Walk)
+            if (playerAnimator.animationState == PlayerAniState.Run)
                 playerAnimator.animationState = PlayerAniState.Idle;
         }
     }
@@ -162,7 +161,7 @@ public class Player : Character
                 playerAnimator.animationState = PlayerAniState.Dash;
             dashTimer -= Time.deltaTime;
             velocity = dashDirection.normalized * DashVelocity;
-            controller.Dash(velocity * Time.deltaTime);
+            controller.Move(velocity * Time.deltaTime);
         }
         else
         {
@@ -170,5 +169,16 @@ public class Player : Character
                 playerAnimator.animationState = PlayerAniState.Idle;
             controller.Move(velocity * Time.deltaTime);
         }
+    }
+    private void OnTriggerStay(Collider other)
+    {
+        print(other.transform.name);
+        if (other.GetComponent<OneWayBoxCollider>() != null && isSwitching)
+        {
+            print("down");
+            Physics.IgnoreCollision(GetComponent<BoxCollider>(), other.GetComponent<OneWayBoxCollider>().collider, true);
+        }
+        else if (other.GetComponent<OneWayBoxCollider>() == null)
+            isSwitching = false;
     }
 }
