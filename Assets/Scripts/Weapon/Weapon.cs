@@ -2,6 +2,31 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class Weapon : MonoBehaviour
+public class Weapon : MonoBehaviour
 {
+    public WeaponData weaponData;
+    void Start()
+    {
+    }
+
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            Debug.Log("Damage: " + DamageSystem.CalculateDamage(weaponData.Damage, weaponData.CriticalHitChance, weaponData.CriticalHitDamage));
+        }
+
+        Collider2D[] colliders = Physics2D.OverlapBoxAll(weaponData.RangeP.position, weaponData.Range, 0, weaponData.LayerName);
+
+        foreach (Collider2D collider in colliders)
+        {
+            Debug.Log("Enemyname: " + collider.name);
+        }
+
+    }
+    void OnDrawGizmos()
+    {
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireCube(weaponData.RangeP.position, weaponData.Range);
+    }
 }

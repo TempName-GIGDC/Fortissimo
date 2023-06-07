@@ -4,12 +4,17 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
-public struct WeaponInfo
+[CreateAssetMenu(fileName = "Weapon Data", menuName = "Scriptable Object/WeaponData", order = int.MaxValue)]
+public class WeaponData : ScriptableObject
 {
     /// <summary>
     /// 레이어 마스크 변수
     /// </summary>
     public LayerMask LayerName;
+    /// <summary>
+    /// 무기 이름
+    /// </summary>
+    public string WeaponName;
     /// <summary>
     /// 공격력
     /// </summary>
@@ -52,19 +57,7 @@ public struct WeaponInfo
     public float Cut;
 }
 
-
 public class WeaponSystem : MonoBehaviour
 {
-    public List<WeaponInfo> weaponInfos;
-
-    [ContextMenu("To Json Data")]
-    void WeaponStatSave()
-    {
-        string json = JsonUtility.ToJson(weaponInfos);
-
-        string FileName = "WeaponInfo";
-        string path = Application.dataPath + "/" + FileName + ".Json";
-
-        File.WriteAllText(path, json);
-    }
+    
 }
