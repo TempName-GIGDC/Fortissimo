@@ -9,17 +9,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
-  m_Name: Axe
-  m_EditorClassIdentifier: Assembly-CSharp::WeaponData
+  m_Script: {fileID: 11500000, guid: 5269be0c724317145a5379b117332a51, type: 3}
+  m_Name: PoleAxeData
+  m_EditorClassIdentifier: 
   LayerName:
     serializedVersion: 2
     m_Bits: 0
-  WeaponName: 
+  WeaponName: PoleAxe
   Damage: 0
   AttackSpeed: 0
   Range: {x: 0, y: 0}
-  RangeP: {fileID: 0}
   CriticalHitChance: 0
   CriticalHitDamage: 0
   Penetrate: 0
