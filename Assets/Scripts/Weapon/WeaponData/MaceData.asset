@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5269be0c724317145a5379b117332a51, type: 3}
+  m_Name: MaceData
+  m_EditorClassIdentifier: 
+  LayerName:
+    serializedVersion: 2
+    m_Bits: 0
+  WeaponName: Mace
+  Damage: 0
+  AttackSpeed: 0
+  Range: {x: 0, y: 0}
+  CriticalHitChance: 0
+  CriticalHitDamage: 0
+  Penetrate: 0
+  Shock: 0
+  Pierce: 0
+  Cut: 0
