@@ -7,7 +7,7 @@ public class PassiveSkillSlot : MonoBehaviour
     [SerializeField]
     public PassiveSkill[] PassiveSlot = new PassiveSkill[4];
     public Player p;
-    public PassiveTest pt;
+    public PassiveSkillRead pt;
 
     private void Start()
     {
