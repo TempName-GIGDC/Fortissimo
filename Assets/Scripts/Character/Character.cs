@@ -1,6 +1,12 @@
 using System;
 using UnityEngine;
 
+
+public enum CharacterDirection
+{
+    Right = 0,
+    Left
+}
 public enum CharacterType
 {
     None = 0,
@@ -8,8 +14,8 @@ public enum CharacterType
     Enemy
 }
 
-public enum CharacterState 
-{ 
+public enum CharacterState
+{
     Idle = 0,
     Walk,
     Dash,
@@ -32,18 +38,19 @@ public struct CharacterStatus
     [field: SerializeField] public float Damage { get; set; }
     [field: SerializeField] public float Speed { get; set; }
     [field: SerializeField] public float AttackSpeed { get; set; }
-    [field: SerializeField] public int JumpCount { get; set; }
     [field: SerializeField] public float JumpHeight { get; set; }
     [field: SerializeField] public float TimeToJumpApex { get; set; }
     [field: SerializeField] public float Defense { get; set; }
     [field: SerializeField] public float Pierce { get; set; }
 }
+[RequireComponent(typeof(Rigidbody2D))]
 public abstract class Character : MonoBehaviour
 {
-    public Vector3 Direction;
+    public CharacterDirection Direction;
     public CharacterStatus Status;
     public CharacterType Type;
 
+    public Rigidbody2D Rigidbody;
     public void Attack(Character target)
     {
         target.Hit(Status.Damage, Status.Pierce);
