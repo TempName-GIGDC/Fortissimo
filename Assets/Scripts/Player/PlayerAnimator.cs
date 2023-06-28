@@ -1,31 +1,29 @@
 using UnityEngine;
 
-public enum PlayerAniState { Idle = 0, Walk, Run, Jump, Dash }
-
 public class PlayerAnimator : MonoBehaviour
 {
-    public PlayerAniState animationState = PlayerAniState.Idle;
-    PlayerAniState currentState;
-    Animator animator;
-    // Start is called before the first frame update
+    Player _player;
+    Animator _animator;
+    PlayerState _state;
+
     void Start()
     {
-        animator = GetComponent<Animator>();
-        currentState = animationState;
+        _player = GetComponent<Player>();
+        _animator = GetComponent<Animator>();
+        _state = _player.State;
     }
 
-    // Update is called once per frame
     void Update()
     {
-        if (animationState == currentState)
+        if (_state == _player.State)
             return;
 
-        if (animationState != PlayerAniState.Idle)
-            animator.SetBool(animationState.ToString(), true);
+        if (_player.State != PlayerState.Idle)
+            _animator.SetBool(_player.State.ToString(), true);
 
-        if (currentState != PlayerAniState.Idle)
-            animator.SetBool(currentState.ToString(), false);
+        if (_state != PlayerState.Idle)
+            _animator.SetBool(_state.ToString(), false);
 
-        currentState = animationState;
+        _state = _player.State;
     }
 }
