@@ -1131,5 +1131,4 @@ MonoBehaviour:
   JumpVelocity: 0
   player: {fileID: 0}
   CheckTime: 5
-  RunTimer: 5
-  pattern: 0
+  RunTime: 5
